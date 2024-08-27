@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterSchema } from '@/schemas'
 import { z } from 'zod';
-import { login } from '@/actions/login';
+import { register as registerUser } from '@/actions/register';
 import FormError from '@/components/ui/formError';
 import FormSuccess from '@/components/ui/formSuccess';
 
@@ -27,7 +27,7 @@ const RegisterForm = () => {
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     startTransition(async() => {
-      login(values)
+      registerUser(values)
         .then(data => {
           setError(data.error)
           setSuccess(data.success)

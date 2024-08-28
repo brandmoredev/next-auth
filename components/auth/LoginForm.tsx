@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react'
 import CardWrapper from './CardWrapper'
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema } from '@/schemas'
 import { z } from 'zod';
@@ -15,6 +15,7 @@ const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const [success, setSuccess] = useState<string | undefined>("")
   const [error, setError] = useState<string | undefined>("")
+  const [statusBar, setStatusBar] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -26,10 +27,12 @@ const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     startTransition(async() => {
+      setStatusBar(true)
+
       login(values)
         .then(data => {
-          setError(data.error)
-          setSuccess(data.success)
+          console.log(data)
+          setError(data?.error)
     })
     })
   }
@@ -50,7 +53,7 @@ const LoginForm = () => {
             className="form_input"
             placeholder="Enter your email"
             disabled={isPending}
-            {...register("email", { required: "Email is required" })}
+            {...register("email", { required: "Email is required", onChange: () => setStatusBar(false) })}
           />
           {errors.email && (
             <span className="text-red-500 text-sm mt-1">{errors.email.message}</span>
@@ -65,19 +68,25 @@ const LoginForm = () => {
             type="password"
             placeholder="Enter your password"
             disabled={isPending}
-            {...register("password", { required: "Password is required" })}
+            
+            {...register("password", { required: "Password is required", onChange: () => setStatusBar(false) })}
           />
           {errors.password && (
             <span className="text-red-500 text-sm mt-1">{errors.password.message}</span>
           )}
         </div>
         
-        <FormError message={error}/>
-        <FormSuccess message={success}/>
+        { statusBar &&
+          <>
+            <FormError message={error}/>
+            <FormSuccess message={success}/>
+          </>
+        }
+        
         <button
           disabled={isPending}
           type="submit"
-          className="btn"
+          className={`${isPending ? "btn_disabled" : "btn"}`}
         >
           Login
         </button>

@@ -9,9 +9,13 @@ import { z } from 'zod';
 import { login } from '@/actions/login';
 import FormError from '@/components/ui/formError';
 import FormSuccess from '@/components/ui/formSuccess';
+import { useSearchParams } from 'next/navigation';
 
 
 const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already in use with different provider!" : ""
+
   const [isPending, startTransition] = useTransition();
   const [success, setSuccess] = useState<string | undefined>("")
   const [error, setError] = useState<string | undefined>("")
@@ -31,7 +35,6 @@ const LoginForm = () => {
 
       login(values)
         .then(data => {
-          console.log(data)
           setError(data?.error)
     })
     })
@@ -76,12 +79,10 @@ const LoginForm = () => {
           )}
         </div>
         
-        { statusBar &&
           <>
-            <FormError message={error}/>
+            <FormError message={error || urlError}/>
             <FormSuccess message={success}/>
           </>
-        }
         
         <button
           disabled={isPending}

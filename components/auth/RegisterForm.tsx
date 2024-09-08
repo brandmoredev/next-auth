@@ -45,7 +45,7 @@ const RegisterForm = () => {
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
           <input
             id="name"
             className="form_input"

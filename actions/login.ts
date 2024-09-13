@@ -1,4 +1,5 @@
 "use server"
+import bcrypt from "bcrypt";
 
 import * as z from "zod"
 import { AuthError } from "next-auth";
@@ -23,18 +24,25 @@ export const login = async(values: z.infer<typeof LoginSchema>) => {
 
   // if user tries to login with a provider account
   if (!existingUser || !existingUser.email || !existingUser.password) {
-    return { error: "Email does not exist"}
+    return { error: "Something went wrong!"}
   }
 
   // Resend a new verification email if user is not verified
   if (!existingUser.emailVerified) {
-    const verificationToken = await generateVerificationToken(existingUser.email)
-
-    await sendVerificationEmail(
-      verificationToken.email,
-      verificationToken.token,
-    )
-
+    const isMatchingPassword = await bcrypt.compare(password, existingUser.password);
+    console.log("TEST", isMatchingPassword)
+    
+    if (isMatchingPassword) {
+      const verificationToken = await generateVerificationToken(existingUser.email)
+  
+      await sendVerificationEmail(
+        verificationToken.email,
+        verificationToken.token,
+      )
+    } else {
+      return { error: "Invalid credentials"}
+    }
+    
     return { success: "Confirmation email sent" }
   }
 
